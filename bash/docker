@@ -1,0 +1,77 @@
+# To be sourced from .bashrc
+
+
+
+# Find docker image matching current path
+function findDockerImageFromPath() {
+  CurrentPath=`pwd`
+  docker inspect --format='{{$id := .Id}}{{range $to, $from := .Volumes}}{{$id}}:{{println $from}}{{end}}' $(docker ps -q) | sed '/^$/d' |
+  while read line; do
+
+    VolumePath=`expr match "$line" "^[^:]\+:\(.*\)$"`
+    if echo "$CurrentPath" | grep -q "$VolumePath"; then
+      ContainerId=`expr match "$line" "^\([^:]\+\):.*$"`
+      RemainingPath=`expr match "$CurrentPath" "^$VolumePath/\(.*\)$"`
+      echo "$ContainerId:$VolumePath:$RemainingPath"
+      return 0
+    fi
+    
+  done;
+  return 1
+}
+
+# Perform a docker exec on docker image matching current path
+function dockerId() {
+  res=`findDockerImageFromPath`                      
+  echo `expr match "$res" "^\([^:]\+\):.*$"`
+}
+
+# Perform a docker exec on docker image matching current path
+function dockerExec() {
+  res=`findDockerImageFromPath`                      
+  if [[ $? -ne 0 ]]; then 
+    echo 'No docker container found matching current path';
+    return 1
+  fi
+
+  ContainerId=`expr match "$res" "^\([^:]\+\):.*$"`
+  Cmd=`echo docker exec -it $ContainerId bash -ic \"$@\"`
+  
+  echo "Run '$Cmd'"
+  eval $Cmd
+}
+
+# Perform a docker exec on docker image matching current path with all input " ." being replaced by corresponding relative path regarding
+function dockerExecRel() {
+  res=`findDockerImageFromPath`                      
+  if [[ $? -ne 0 ]]; then 
+    echo 'No docker container found matching current path';
+    return 1
+  fi
+
+  ContainerId=`expr match "$res" "^\([^:]\+\):.*$"`
+  SubPath=" "`expr match "$res" "^.*:\([^:]\+\)$"`
+  Search=" \."
+  Cmd=`echo docker exec -it $ContainerId bash -ic \"$@\" | sed -r "s/ \\./$SubPath/"`
+
+  echo "Run '$Cmd'"
+  eval $Cmd
+}
+
+function dphpunit() {
+  dockerExecRel phpunit ./"$@"
+}
+
+function dphp() {
+  dockerExecRel "php $@"
+}
+
+
+alias d="docker exec -it \`dockerId\` bash"
+
+# Delete all unused images layers
+alias docker-flush='docker rmi $(docker images -f "dangling=true" -q)'
+
+# Get docker host ip
+alias docker-host-ip='ip route | grep docker |  sed -e "s/.* src //" | tr -d " "'
+
