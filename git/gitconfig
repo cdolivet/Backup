@@ -3,7 +3,10 @@
 #    path = /path/to/file
 
 [push]
-	default = simple
+	default = current
+
+[core]
+    mergeoptions = --no-edit
 
 [alias]
         ##### BASIC ALIASES #####
