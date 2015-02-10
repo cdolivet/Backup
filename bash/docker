@@ -5,12 +5,12 @@
 # Find docker image matching current path
 function findDockerImageFromPath() {
   CurrentPath=`pwd`
-  docker inspect --format='{{$id := .Id}}{{range $to, $from := .Volumes}}{{$id}}:{{println $from}}{{end}}' $(docker ps -q) | sed '/^$/d' |
+  docker inspect --format='{{$id := or .Name .Id}}{{range $to, $from := .Volumes}}{{$id}}:{{println $from}}{{end}}' $(docker ps -q) | sed '/^$/d' |
   while read line; do
 
     VolumePath=`expr match "$line" "^[^:]\+:\(.*\)$"`
     if echo "$CurrentPath" | grep -q "$VolumePath"; then
-      ContainerId=`expr match "$line" "^\([^:]\+\):.*$"`
+      ContainerId=`expr match "$line" "^/\?\([^:]\+\):.*$"`
       RemainingPath=`expr match "$CurrentPath" "^$VolumePath/\(.*\)$"`
       echo "$ContainerId:$VolumePath:$RemainingPath"
       return 0
@@ -37,7 +37,7 @@ function dockerExec() {
   ContainerId=`expr match "$res" "^\([^:]\+\):.*$"`
   Cmd=`echo docker exec -it $ContainerId bash -ic \"$@\"`
   
-  echo "Run '$Cmd'"
+  echo -e "\e[2m> $Cmd\e[0m"
   eval $Cmd
 }
 
@@ -54,7 +54,7 @@ function dockerExecRel() {
   Search=" \."
   Cmd=`echo docker exec -it $ContainerId bash -ic \"$@\" | sed -r "s/ \\./$SubPath/"`
 
-  echo "Run '$Cmd'"
+  echo -e "\e[2m> $Cmd\e[0m"
   eval $Cmd
 }
 
@@ -68,6 +68,7 @@ function dphp() {
 
 
 alias d="docker exec -it \`dockerId\` bash"
+alias de="dockerExecRel"
 
 # Delete all unused images layers
 alias docker-flush='docker rmi $(docker images -f "dangling=true" -q)'
