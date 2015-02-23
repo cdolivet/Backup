@@ -50,9 +50,10 @@ function dockerExecRel() {
   fi
 
   ContainerId=`expr match "$res" "^\([^:]\+\):.*$"`
-  SubPath=" "`expr match "$res" "^.*:\([^:]\+\)$"`
+  SubPath=`expr match "$res" "^.*:\([^:]\+\)$"`
+  [[ "$SubPath" = "" ]] && SubPath=" ." || SubPath=" $SubPath"
   Search=" \."
-  Cmd=`echo docker exec -it $ContainerId bash -ic \"$@\" | sed -r "s/ \\./$SubPath/"`
+  Cmd=`echo docker exec -it $ContainerId bash -ic \"$@\" | sed -r "s/ \\./${SubPath//\//\\\/}/"`
 
   echo -e "\e[2m> $Cmd\e[0m"
   eval $Cmd
