@@ -6,98 +6,140 @@
 	default = current
 
 [core]
+    editor = nano
     mergeoptions = --no-edit
+    attributesfile = ~/Backup/git/gitattributes
+
+[diff]
+    tool = vimdiff
+[diff "zip"]
+    textconv = zcat
+    binary = true
+[diff "gz"]
+    textconv = zcat
+    binary = true
+[diff "bz2"]
+    textconv = bzcat
+    binary = true
+[diff "xz"]
+    textconv = xzcat
+    binary = true
+[diff "tar"]
+    textconv = tar -O -xf
+    binary = true
+[diff "tar-bz2"]
+    textconv = tar -O -xjf
+    binary = true
+[diff "tar-gz"]
+    textconv = tar -O -xzf
+    binary = true
+[diff "tar-xz"]
+    textconv = tar -O -xJf
+    binary = true
+[diff "odf"]
+    textconv = odt2txt
+[diff "pdf"]
+    textconv = pdfinfo
+[diff "bin"]
+    textconv = hexdump -v -C
+
 
 [alias]
-        ##### BASIC ALIASES #####
-        # Long status
-        st = status
+    ##### BASIC ALIASES #####
+    # Long status
+    st = status
 
-        # Short status
-        s = status -s
+    # Short status
+    s = status -s
 
-        # Show branches
-        br = branch
-        bra = branch -a
-        brr = branch -r
+    # Show branches
+    br = branch
+    bra = branch -a
+    brr = branch -r
 
-        # Show branches with commit message
-        sb = show-branch
+    # Show branches with commit message
+    sb = show-branch
 
-        # Commit
-        ci = commit
+    # Commit
+    ci = commit
 
-        # Checkout
-        co = checkout
+    # Checkout
+    co = checkout
 
     # Show remote repositories
-        r  = remote -v
+    r  = remote -v
 
     # Amend last commit
     amend = ci --amend
 
-        # Removes files/directories from staging
-        unadd = rm -r --cached
+    # Removes files/directories from staging
+    unadd = rm -r --cached
 
     ##### DIFF ALIASES #####
-        # Diff and show commands with word-diff style
-        wd = diff --word-diff
-        ws = show --word-diff
+    # Diff and show commands with word-diff style
+    wd = diff --word-diff
+    ws = show --word-diff
 
-        # Show diff before pull
-        do = diff ORIG_HEAD HEAD
+    # diff so fancy
+    dsf = "!git diff --color $@ | diff-so-fancy"
 
-        # Show modified lines in the index
-        staged = diff --cached
+    # Show diff before pull
+    do = diff ORIG_HEAD HEAD
 
-        # Show modified files
+    # Show modified lines in the index
+    staged = diff --cached
+
+    # Show modified files
     changes= diff --name-status -r
 
-        # Diff with statistics
+    # Diff with statistics
     ds = diff --stat -r
 
-        # Short basic diff
-        changes= diff --name-status -r
+    # Short basic diff
+    changes= diff --name-status -r
 
     ##### LOG ALIASES #####
+    # Grep - find the first commit where a given <string> fist appeared
+    grep-content = log --date=relative --pretty=format:&#39;%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr)%Creset&#39; --source --all -S
+
     # Show HEAD commit
-        head = log --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative -n1
+    head = log --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative -n1
 
-        # Short one line logs with ref-names
-        l  = log --oneline --decorate=short
+    # Short one line logs with ref-names
+    l  = log --oneline --decorate=short
 
-        # Shows the last git logentry (hash, author, date commitmessage)
-        llm = log -1
+    # Shows the last git logentry (hash, author, date commitmessage)
+    llm = log -1
 
-        # Last log message of all submodules
-        llms = !git sf "git llm;"
+    # Last log message of all submodules
+    llms = !git sf "git llm;"
 
-        # Short one line logs with ref-names and statistics
-        gl = log --oneline --decorate --stat --graph
+    # Short one line logs with ref-names and statistics
+    gl = log --oneline --decorate --stat --graph
 
     # Short one line logs with ref-names (yellowà, date (green) and author (blue)
-        glog = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
+    glog = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
 
-        # Graph log with full commit message
-        glaaa = log --graph --abbrev-commit --date=relative
+    # Graph log with full commit message
+    glaaa = log --graph --abbrev-commit --date=relative
 
-        ##### Submodules ####
-        # Shows current sha1s of all submodules and number of commits
-        shc = !git sf 'git h; git c'
+    ##### Submodules ####
+    # Shows current sha1s of all submodules and number of commits
+    shc = !git sf 'git h; git c'
 
-        # Runs submodule-initialisation and update after a fresh checkout RECURSIVE!
-        siu = !git submodule init; git submodule update; git submodule foreach \"git siu\"
+    # Runs submodule-initialisation and update after a fresh checkout RECURSIVE!
+    siu = !git submodule init; git submodule update; git submodule foreach \"git siu\"
 
-        # Pushs all submodules to origin master
-        pushsub = submodule foreach "git push"
+    # Pushs all submodules to origin master
+    pushsub = submodule foreach "git push"
 
-        # Pull submodules from origin master
-        pullsub = submodule foreach "git pull"
+    # Pull submodules from origin master
+    pullsub = submodule foreach "git pull"
 
-        # Shortcut when running something on all submodules - eg. git sf "git s"
-        sf = submodule foreach
+    # Shortcut when running something on all submodules - eg. git sf "git s"
+    sf = submodule foreach
 
-        ##### APPLICATIONS #####
+    ##### APPLICATIONS #####
     # [g = gui]
     g = !git gui &
 
@@ -109,40 +151,40 @@
 
 
     ##### Misc
-        # Show last commiter
-        whois = !sh -c 'git log -i -1 --pretty=\"format:%an <%ae>\n\" --author=\"$1\"' -
+    # Show last commiter
+    whois = !sh -c 'git log -i -1 --pretty=\"format:%an <%ae>\n\" --author=\"$1\"' -
 
-        # Show last commit message
-        whatis = show -s --pretty='tformat:%h (%s, %ad)' --date=short
+    # Show last commit message
+    whatis = show -s --pretty='tformat:%h (%s, %ad)' --date=short
 
-        # Hash of HEAD
-        h = rev-list --max-count=1 HEAD
+    # Hash of HEAD
+    h = rev-list --max-count=1 HEAD
 
-        # Show users which have commits in current branch
-        ul = !git log --format='%aN' | sort -u
+    # Show users which have commits in current branch
+    ul = !git log --format='%aN' | sort -u
 
-        # Number of commits in current branch
-        c  = !git log --oneline | wc -l
+    # Number of commits in current branch
+    c  = !git log --oneline | wc -l
 
-        # Creates a tar.gz archive named after the last commits hash from HEAD! in the directory above the repository
-        ahg = !git archive HEAD --format=tar | gzip > ../`git h`.tar.gz
+    # Creates a tar.gz archive named after the last commits hash from HEAD! in the directory above the repository
+    ahg = !git archive HEAD --format=tar | gzip > ../`git h`.tar.gz
 
-        # shows ignored directories
-        ignored = !git ls-files --others -i --exclude-standard --directory
+    # shows ignored directories
+    ignored = !git ls-files --others -i --exclude-standard --directory
 
     # Move to the root of the repository
-        root = !cd $(git rev-parse --show-cdup)
+    root = !cd $(git rev-parse --show-cdup)
 
-        # Show the root directory of the repository
-        sroot = rev-parse --show-toplevel
+    # Show the root directory of the repository
+    sroot = rev-parse --show-toplevel
 
-        # Prune remote branches
-        prune-all = !git remote | xargs -n 1 git remote prune
+    # Prune remote branches
+    prune-all = !git remote | xargs -n 1 git remote prune
 
-        # Show aliases
-        aliases = !git config --get-regexp 'alias.*' | colrm 1 6 | sed 's/[ ]/ = /'
+    # Show aliases
+    aliases = !git config --get-regexp 'alias.*' | colrm 1 6 | sed 's/[ ]/ = /'
 
-        # Show upstream for the current branch
+    # Show upstream for the current branch
     upstream = !git for-each-ref --format='%(upstream:short)' `git symbolic-ref HEAD`
-        unpushed = diff @{u}..HEAD --name-status
+    unpushed = diff @{u}..HEAD --name-status
 
